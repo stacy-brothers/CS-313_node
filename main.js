@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const PORT = process.env.PORT || 5000;
 const post = require('./services/post');
-const week9 = require('./ctrls/week9.ctrl')
+const personSrvc = require('./services/person.service');
 
 var app = express();
 
@@ -26,8 +26,44 @@ app.get('/cost', (req, res) => {
     res.end(JSON.stringify(post.calcTotal(type, weight)));
 });
 
-app.all('/week9Team', (req, res) => {
-    week9.startTeam(req, res);
+app.get('/week10Team', (req, res) => {
+    res.render('pages/week10Team');
 });
+
+app.get('/person/:id', (req, res) => {
+    var id = req.params.id;
+    personSrvc.getPersonById(id)
+        .then(resp => {
+            console.log("Response:" + JSON.stringify(resp.rows[0]));
+            res.end(JSON.stringify(resp.rows[0]));
+        })
+        .catch(e => {
+            console.log("Error:" + e);
+        });   
+});
+
+app.get('/person/:id/parents', (req, res) => {
+    var id = req.params.id;
+    personSrvc.getParentsByPersonId(id)
+        .then(resp => {
+            res.end(JSON.stringify(resp.rows));
+        })
+        .catch(e => {
+            console.log("Error:" + e);
+        });   
+});
+
+app.get('/person/:id/children', (req, res) => {
+    var id = req.params.id;
+    personSrvc.getChildrenByPersonId(id)
+        .then(resp => {
+            console.log( JSON.stringify(resp) );
+            res.end(JSON.stringify(resp.rows));
+        })
+        .catch(e => {
+            console.log("Error:" + e);
+        });   
+});
+
 
 app.listen(PORT, () => console.log(`Listening on ${ PORT }`));

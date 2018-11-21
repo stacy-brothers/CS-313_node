@@ -1,0 +1,83 @@
+<html>
+    <body>
+        <div><h2>Week 10 Team</h2></div>
+        <div>
+            <input type="text" id="personId">
+            <button onclick="getInfo()">Search</button>
+        </div>
+        <br><br>
+        <div>
+            <span id="personSpan"></span>
+        </div>
+        <br>
+        <div>
+            <span id="parentsSpan"></span>
+        </div>
+        <br>
+        <div>
+            <span id="childrenSpan"></span>
+        </div>
+        <br><br><script type="text/javascript">
+            function getInfo() {
+                // get person
+                var personId = document.getElementById('personId').value;
+                var xhr = new XMLHttpRequest();
+                console.log("Starting search for: " + personId);
+                xhr.open('GET', 'person/' + personId);
+                xhr.onload = function() {
+                    console.log("got response!");
+                    if (xhr.status === 200) {
+                        var resp = JSON.parse(xhr.responseText);
+                        var personSpan = document.getElementById('personSpan');
+                        personSpan.textContent = "Person: " + resp.first + " " + resp.last;
+                    } else {
+                        alert('Request failed.  Returned status of ' + xhr.status);
+                    }
+                };
+                xhr.send();
+                // get parents
+                var xhrP = new XMLHttpRequest();
+                console.log("Starting search for parents of: " + personId);
+                xhrP.open('GET', 'person/' + personId + '/parents');
+                xhrP.onload = function() {
+                    console.log("got parent response!");
+                    if (xhrP.status === 200) {
+                        var respP = JSON.parse(xhrP.responseText);
+                        var parentsSpan = document.getElementById('parentsSpan');
+                        var comma = "";
+                        pText = "Parents: ";
+                        for ( var p = 0; p < respP.length; p++ ) {
+                            pText = pText + comma + respP[p].first + " " + respP[p].last;
+                            comma = ", ";
+                        }
+                        parentsSpan.textContent = pText;
+                    } else {
+                        alert('Parent request failed.  Returned status of ' + xhrP.status);
+                    }
+                };
+                xhrP.send();
+                // get children
+                var xhrC = new XMLHttpRequest();
+                console.log("Starting search for children of: " + personId);
+                xhrC.open('GET', 'person/' + personId + '/children');
+                xhrC.onload = function() {
+                    console.log("got children response!");
+                    if (xhrC.status === 200) {
+                        var respC = JSON.parse(xhrC.responseText);
+                        var childrenSpan = document.getElementById('childrenSpan');
+                        var comma = "";
+                        cText = "Children: ";
+                        for ( var c = 0; c < respC.length; c++ ) {
+                            cText = cText + comma + respC[c].first + " " + respC[c].last;
+                            comma = ", ";
+                        }
+                        childrenSpan.textContent = cText;
+                    } else {
+                        alert('Children request failed.  Returned status of ' + xhrC.status);
+                    }
+                };
+                xhrC.send();
+            }
+        </script>
+    </body>    
+</html>
